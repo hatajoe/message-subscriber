@@ -1,0 +1,8 @@
+machine:
+    timezone: 
+        Asia/Tokyo
+test:
+    pre: 
+        - go vet ./...
+    override:
+        - go test -v -race ./...
