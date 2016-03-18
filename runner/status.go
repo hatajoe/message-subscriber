@@ -4,7 +4,7 @@ package runner
 type Status int
 
 const (
-	Running Status = iota
-	Stopped
+	Stopped Status = iota
+	Running
 	Aborted
 )

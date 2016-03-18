@@ -45,8 +45,8 @@ func (m *TestSubscriber) End() error {
 
 func TestRun(t *testing.T) {
 	message := make(chan map[string]interface{})
-	r := runner.NewRunner(runner.Option{})
-	go func(rn *runner.Runner) {
+	r := runner.NewRunner(runner.Option{InitialState: runner.Running})
+	go func() {
 		for m := range message {
 			if m, ok := m["key1"]; !ok {
 				t.Error("err: map expect has a key `key1'")
@@ -83,10 +83,10 @@ func TestRun(t *testing.T) {
 				}
 
 			}
-			rn.ChangeState(runner.Aborted)
+			r.SetState(runner.Aborted)
 			break
 		}
-	}(r)
+	}()
 	sub := NewTestSubscriber(message)
 	r.Run(sub)
 }
