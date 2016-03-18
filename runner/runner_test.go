@@ -29,6 +29,10 @@ func (m *TestSubscriber) Subscribe() error {
 	return nil
 }
 
+func (m *TestSubscriber) UnSubscribe() error {
+	return nil
+}
+
 func (m *TestSubscriber) Abort() error {
 	m.abort = true
 	return nil
