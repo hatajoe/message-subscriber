@@ -4,46 +4,41 @@ import (
 	"log"
 	"time"
 
-	"sync"
-
 	"github.com/hatajoe/message-subscriber"
 )
 
 type Runner struct {
-	status        Status
-	sleepDuration time.Duration
-	mu            sync.Mutex
+	option Option
+	status chan Status
 }
 
-func NewRunner(option Option) *Runner {
+func NewRunner(opts Option) *Runner {
 	return &Runner{
-		status:        option.InitialState,
-		sleepDuration: option.SleepDuration,
+		option: opts,
+		status: make(chan Status),
 	}
 }
 
-func (m *Runner) GetState() Status {
-	m.mu.Lock()
-	status := m.status
-	m.mu.Unlock()
-	return status
-}
-
-func (m *Runner) SetState(st Status) {
-	m.mu.Lock()
-	m.status = st
-	m.mu.Unlock()
+func (m *Runner) ChangeState(st Status) {
+	m.status <- st
 }
 
 func (m *Runner) Run(sub subscriber.Subscriber) {
+	status := m.option.InitialState
+	duration := m.option.InitialDuration
 	for {
-		switch m.GetState() {
-		case Stopped:
-			time.Sleep(m.sleepDuration)
-		case Running:
-			m.run(sub)
-		case Aborted:
-			return
+		select {
+		case st := <-m.status:
+			status = st
+		default:
+			switch status {
+			case Running:
+				m.run(sub)
+			case Stopped:
+				time.Sleep(duration)
+			case Aborted:
+				return
+			}
 		}
 	}
 }

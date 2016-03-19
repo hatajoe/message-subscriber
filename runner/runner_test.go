@@ -29,10 +29,6 @@ func (m *TestSubscriber) Subscribe() error {
 	return nil
 }
 
-func (m *TestSubscriber) UnSubscribe() error {
-	return nil
-}
-
 func (m *TestSubscriber) Abort() error {
 	m.abort = true
 	return nil
@@ -45,8 +41,8 @@ func (m *TestSubscriber) End() error {
 
 func TestRun(t *testing.T) {
 	message := make(chan map[string]interface{})
-	r := runner.NewRunner(runner.Option{InitialState: runner.Running})
-	go func() {
+	r := runner.NewRunner(runner.Option{})
+	go func(rn *runner.Runner) {
 		for m := range message {
 			if m, ok := m["key1"]; !ok {
 				t.Error("err: map expect has a key `key1'")
@@ -83,10 +79,10 @@ func TestRun(t *testing.T) {
 				}
 
 			}
-			r.SetState(runner.Aborted)
+			rn.ChangeState(runner.Aborted)
 			break
 		}
-	}()
+	}(r)
 	sub := NewTestSubscriber(message)
 	r.Run(sub)
 }
