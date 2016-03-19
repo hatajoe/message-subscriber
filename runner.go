@@ -3,8 +3,6 @@ package runner
 import (
 	"log"
 	"time"
-
-	"github.com/hatajoe/message-subscriber"
 )
 
 type Runner struct {
@@ -23,7 +21,7 @@ func (m *Runner) ChangeState(st Status) {
 	m.status <- st
 }
 
-func (m *Runner) Run(sub subscriber.Subscriber) {
+func (m *Runner) Run(sub Subscriber) {
 	status := m.option.InitialState
 	duration := m.option.InitialDuration
 	for {
@@ -43,7 +41,7 @@ func (m *Runner) Run(sub subscriber.Subscriber) {
 	}
 }
 
-func (m *Runner) run(sub subscriber.Subscriber) {
+func (m *Runner) run(sub Subscriber) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println(err)

@@ -4,7 +4,7 @@ package runner
 
 import "fmt"
 
-const _Status_name = "AbortedRunningStopped"
+const _Status_name = "RunningStoppedAborted"
 
 var _Status_index = [...]uint8{0, 7, 14, 21}
 

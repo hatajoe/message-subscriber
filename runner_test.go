@@ -3,7 +3,7 @@ package runner_test
 import (
 	"testing"
 
-	"github.com/hatajoe/message-subscriber/runner"
+	"github.com/hatajoe/message-subscriber"
 )
 
 type TestSubscriber struct {

@@ -1,4 +1,4 @@
-package subscriber
+package runner
 
 // Subscriber is message subscriber interface for Runner
 type Subscriber interface {
