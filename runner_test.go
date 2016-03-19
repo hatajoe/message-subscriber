@@ -8,15 +8,11 @@ import (
 
 type TestSubscriber struct {
 	message chan map[string]interface{}
-	abort   bool
-	end     bool
 }
 
 func NewTestSubscriber(message chan map[string]interface{}) *TestSubscriber {
 	return &TestSubscriber{
 		message: message,
-		abort:   false,
-		end:     false,
 	}
 }
 
@@ -30,20 +26,21 @@ func (m *TestSubscriber) Subscribe() error {
 }
 
 func (m *TestSubscriber) Abort() error {
-	m.abort = true
 	return nil
 }
 
 func (m *TestSubscriber) End() error {
-	m.end = true
 	return nil
 }
 
 func TestRun(t *testing.T) {
 	message := make(chan map[string]interface{})
-	r := runner.NewRunner(runner.Option{})
+	r := runner.NewRunner(runner.Option{InitialState: runner.Running})
 	go func(rn *runner.Runner) {
 		for m := range message {
+			if rn.GetState() == runner.Aborted {
+				break
+			}
 			if m, ok := m["key1"]; !ok {
 				t.Error("err: map expect has a key `key1'")
 			} else {
@@ -80,7 +77,6 @@ func TestRun(t *testing.T) {
 
 			}
 			rn.SetState(runner.Aborted)
-			break
 		}
 	}(r)
 	sub := NewTestSubscriber(message)
