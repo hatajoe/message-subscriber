@@ -3,40 +3,45 @@ package runner
 import (
 	"log"
 	"time"
+
+	"sync"
 )
 
 type Runner struct {
-	option Option
-	status chan Status
+	status        Status
+	sleepDuration time.Duration
+	mu            sync.Mutex
 }
 
-func NewRunner(opts Option) *Runner {
+func NewRunner(option Option) *Runner {
 	return &Runner{
-		option: opts,
-		status: make(chan Status),
+		status:        option.InitialState,
+		sleepDuration: option.SleepDuration,
 	}
 }
 
-func (m *Runner) ChangeState(st Status) {
-	m.status <- st
+func (m *Runner) GetState() Status {
+	m.mu.Lock()
+	status := m.status
+	m.mu.Unlock()
+	return status
+}
+
+func (m *Runner) SetState(st Status) {
+	m.mu.Lock()
+	m.status = st
+	m.mu.Unlock()
 }
 
 func (m *Runner) Run(sub Subscriber) {
-	status := m.option.InitialState
-	duration := m.option.InitialDuration
 	for {
-		select {
-		case st := <-m.status:
-			status = st
-		default:
-			switch status {
-			case Running:
-				m.run(sub)
-			case Stopped:
-				time.Sleep(duration)
-			case Aborted:
-				return
-			}
+		switch m.GetState() {
+		case Stopped:
+			time.Sleep(m.sleepDuration)
+		case Running:
+			m.run(sub)
+		case Aborted:
+			return
 		}
 	}
 }

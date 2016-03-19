@@ -3,7 +3,7 @@ package runner_test
 import (
 	"testing"
 
-	"github.com/hatajoe/message-subscriber"
+	"github.com/hatajoe/message-subscriber-runner"
 )
 
 type TestSubscriber struct {
@@ -79,7 +79,7 @@ func TestRun(t *testing.T) {
 				}
 
 			}
-			rn.ChangeState(runner.Aborted)
+			rn.SetState(runner.Aborted)
 			break
 		}
 	}(r)
